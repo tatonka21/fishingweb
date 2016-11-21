@@ -6,17 +6,7 @@ use MongoDB\Client as MyMongo;
 
 $client = new Client();
 
-$mondoDBuser = 'collection';
-$mondoDBpassword = 'sd!v908%w2k2m2f8f#';
-//$mongoDBurl = 'mongodb://'.$mondoDBuser.':'.$mondoDBpassword.'@ds013290.mlab.com:13290';
-
-
-//$mongo = new MyMongo($mongoDBurl);*/
-
-/*$mongoDBurl = 'mongodb://ds013290.mlab.com:13290';
-$mongo = new MyMongo($mongoDBurl);
-$mongo->User = $mondoDBuser;
-$mongo->Password = $mondoDBpassword;*/
+ require 'mongoauth.php';
 
  $host='ds013290.mlab.com:13290';
  $userdb='ilmateenistus';

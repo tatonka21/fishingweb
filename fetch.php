@@ -1,6 +1,6 @@
 <?php
 require 'helpers.php';
-?>
+/*
 <!doctype html>
 
 <html lang="en">
@@ -8,8 +8,9 @@ require 'helpers.php';
   <meta charset="utf-8">
 </head>
 <body>
-<?php
+*/
 mb_http_output('UTF-8');
+mb_internal_encoding('UTF-8');
 
 require __DIR__ . '/vendor/autoload.php';
 use Goutte\Client;
@@ -25,12 +26,22 @@ if (PRODUCTION) {
 }
 
 /* prepwork */
-if ($result = $mysqli->query("select id,stationName from weatherStations")) {
+if (!$result = $mysqli->query("select id,stationName from weatherStations")) {
+    logError("Error getting stationIDs:\n".$mysqli->error);
+} else {
     while ($row = $result->fetch_assoc()) {
         $stationDbIds[$row['id']]=$row['stationName'];
-    }
+    }    
+    $result->free();
+};
+
+if (!$result = $mysqli->query("select id,upper(weatherName) as weatherName from weatherTypes")) {
+    logError("Error getting weatherIDs: <br>".$mysqli->error);
 } else {
-    logError("Error getting stationIDs:\n"+$mysqli->error);
+    while ($row = $result->fetch_assoc()) {
+        $weatherDbIds[$row['id']]=$row['weatherName'];
+    }
+    $result->free();
 };
 
 try {
@@ -74,6 +85,7 @@ try {
         $node->filterXpath('//td')->each(function($td){
             global $i;
             global $stationDbIds;
+            global $weatherDbIds;
             global $stationValues;
     
             $i++;
@@ -82,6 +94,11 @@ try {
             if (($i==1) && ($index = array_search($value,$stationDbIds))) { // if first column (stationName) and stationName found in DB array
                 $value = $index; // replace value with DB index
             }
+             
+            if (($i==10) && ($index = array_search(mb_strtoupper($value),$weatherDbIds))) { // if 10th column (weatherName) and weatherName found in DB array
+                $value = $index; // replace value with DB index
+            }
+
             $stationValues[]=$value;    
         });
         
@@ -129,9 +146,9 @@ $qry = "INSERT
     
     if (!$result = $mysqli->query($qry)) {
         logError("Executing query: ".$mysqli->error."<br>".$qry);
-        exit;
     }
 
-?>
+/*
 </body>
-</html>
+</html>*/
+?>
